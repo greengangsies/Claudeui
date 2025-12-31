@@ -2086,14 +2086,16 @@ function ClaudeUI:CreateWindow(config)
                     local buttonPos = mainButton.AbsolutePosition
                     local buttonSize = mainButton.AbsoluteSize
                     local screenSize = workspace.CurrentCamera.ViewportSize
+                    local guiInset = game:GetService("GuiService"):GetGuiInset()
                     
                     -- Calculate dimensions
                     local optionsWidth = buttonSize.X
                     local maxHeight = math.min(#dropdownConfig.Options * 34 + 8, 250)
                     local padding = 4
                     
+                    -- Add GUI inset since ScreenGui has IgnoreGuiInset = true
                     local posX = buttonPos.X
-                    local posY = buttonPos.Y + buttonSize.Y + padding
+                    local posY = buttonPos.Y + buttonSize.Y + padding + guiInset.Y
                     
                     -- Adjust if off screen
                     if posX + optionsWidth > screenSize.X - padding then
@@ -2101,7 +2103,7 @@ function ClaudeUI:CreateWindow(config)
                     end
                     if posY + maxHeight > screenSize.Y - padding then
                         -- Open above instead
-                        posY = buttonPos.Y - maxHeight - padding
+                        posY = buttonPos.Y - maxHeight - padding + guiInset.Y
                     end
                     if posY < padding then
                         posY = padding
@@ -2423,14 +2425,16 @@ function ClaudeUI:CreateWindow(config)
                     local buttonPos = previewButton.AbsolutePosition
                     local buttonSize = previewButton.AbsoluteSize
                     local screenSize = workspace.CurrentCamera.ViewportSize
+                    local guiInset = game:GetService("GuiService"):GetGuiInset()
                     
                     -- Calculate position
                     local pickerWidth = 240
                     local pickerHeight = 280
                     local padding = 8
                     
+                    -- Add GUI inset since ScreenGui has IgnoreGuiInset = true
                     local posX = buttonPos.X + buttonSize.X - pickerWidth
-                    local posY = buttonPos.Y + buttonSize.Y + padding
+                    local posY = buttonPos.Y + buttonSize.Y + padding + guiInset.Y
                     
                     -- Adjust if off screen
                     if posX < padding then
@@ -2440,7 +2444,7 @@ function ClaudeUI:CreateWindow(config)
                         posX = screenSize.X - pickerWidth - padding
                     end
                     if posY + pickerHeight > screenSize.Y - padding then
-                        posY = buttonPos.Y - pickerHeight - padding
+                        posY = buttonPos.Y - pickerHeight - padding + guiInset.Y
                     end
                     if posY < padding then
                         posY = padding
@@ -2454,7 +2458,7 @@ function ClaudeUI:CreateWindow(config)
                     pickerWindow.Size = UDim2.new(0, pickerWidth, 0, 0)
                     pickerWindow.Position = UDim2.new(0, posX, 0, posY)
                     pickerWindow.ClipsDescendants = true
-                    pickerWindow.ZIndex = 1000
+                    pickerWindow.ZIndex = 5500
                     pickerWindow.Parent = ClaudeUI._screenGui
                     
                     local windowCorner = Instance.new("UICorner")
@@ -2471,7 +2475,7 @@ function ClaudeUI:CreateWindow(config)
                     header.Name = "Header"
                     header.BackgroundTransparency = 1
                     header.Size = UDim2.new(1, 0, 0, 36)
-                    header.ZIndex = 1001
+                    header.ZIndex = 5501
                     header.Parent = pickerWindow
                     
                     local headerTitle = Instance.new("TextLabel")
@@ -2484,7 +2488,7 @@ function ClaudeUI:CreateWindow(config)
                     headerTitle.TextColor3 = theme.TextPrimary
                     headerTitle.TextSize = theme.FontSizeMD
                     headerTitle.TextXAlignment = Enum.TextXAlignment.Left
-                    headerTitle.ZIndex = 1001
+                    headerTitle.ZIndex = 5501
                     headerTitle.Parent = header
                     
                     local closeBtn = Instance.new("TextButton")
@@ -2497,7 +2501,7 @@ function ClaudeUI:CreateWindow(config)
                     closeBtn.TextColor3 = theme.TextSecondary
                     closeBtn.TextSize = 20
                     closeBtn.Font = Enum.Font.GothamBold
-                    closeBtn.ZIndex = 1002
+                    closeBtn.ZIndex = 5502
                     closeBtn.Parent = header
                     
                     closeBtn.MouseButton1Click:Connect(closePicker)
@@ -2515,7 +2519,7 @@ function ClaudeUI:CreateWindow(config)
                     currentPreview.BorderSizePixel = 0
                     currentPreview.Size = UDim2.new(1, -24, 0, 24)
                     currentPreview.Position = UDim2.new(0, 12, 0, 40)
-                    currentPreview.ZIndex = 1001
+                    currentPreview.ZIndex = 5501
                     currentPreview.Parent = pickerWindow
                     
                     local currentPreviewCorner = Instance.new("UICorner")
@@ -2534,7 +2538,7 @@ function ClaudeUI:CreateWindow(config)
                     gradientFrame.BorderSizePixel = 0
                     gradientFrame.Size = UDim2.new(1, -24, 0, 140)
                     gradientFrame.Position = UDim2.new(0, 12, 0, 72)
-                    gradientFrame.ZIndex = 1001
+                    gradientFrame.ZIndex = 5501
                     gradientFrame.Parent = pickerWindow
                     
                     local gradientCorner = Instance.new("UICorner")
@@ -2547,8 +2551,8 @@ function ClaudeUI:CreateWindow(config)
                         ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
                     })
                     whiteGradient.Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 0),
-                        NumberSequenceKeypoint.new(1, 1)
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(1, 0)
                     })
                     whiteGradient.Parent = gradientFrame
                     
@@ -2557,7 +2561,7 @@ function ClaudeUI:CreateWindow(config)
                     blackOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
                     blackOverlay.BorderSizePixel = 0
                     blackOverlay.Size = UDim2.new(1, 0, 1, 0)
-                    blackOverlay.ZIndex = 1002
+                    blackOverlay.ZIndex = 5502
                     blackOverlay.Parent = gradientFrame
                     
                     local blackCorner = Instance.new("UICorner")
@@ -2581,9 +2585,9 @@ function ClaudeUI:CreateWindow(config)
                     colorSelector.BackgroundColor3 = currentColor
                     colorSelector.BorderSizePixel = 0
                     colorSelector.Size = UDim2.new(0, 18, 0, 18)
-                    colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
+                    colorSelector.Position = UDim2.new(1 - s, 0, 1 - v, 0)
                     colorSelector.AnchorPoint = Vector2.new(0.5, 0.5)
-                    colorSelector.ZIndex = 1004
+                    colorSelector.ZIndex = 5504
                     colorSelector.Parent = gradientFrame
                     
                     local selectorCorner = Instance.new("UICorner")
@@ -2602,7 +2606,7 @@ function ClaudeUI:CreateWindow(config)
                     hueFrame.BorderSizePixel = 0
                     hueFrame.Size = UDim2.new(1, -24, 0, 20)
                     hueFrame.Position = UDim2.new(0, 12, 0, 220)
-                    hueFrame.ZIndex = 1001
+                    hueFrame.ZIndex = 5501
                     hueFrame.Parent = pickerWindow
                     
                     local hueCorner = Instance.new("UICorner")
@@ -2628,7 +2632,7 @@ function ClaudeUI:CreateWindow(config)
                     hueSelector.Size = UDim2.new(0, 8, 0, 26)
                     hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
                     hueSelector.AnchorPoint = Vector2.new(0.5, 0.5)
-                    hueSelector.ZIndex = 1003
+                    hueSelector.ZIndex = 5503
                     hueSelector.Parent = hueFrame
                     
                     local hueSelectorCorner = Instance.new("UICorner")
@@ -2650,7 +2654,7 @@ function ClaudeUI:CreateWindow(config)
                     rgbLabel.TextColor3 = theme.TextSecondary
                     rgbLabel.TextSize = theme.FontSizeSM
                     rgbLabel.TextXAlignment = Enum.TextXAlignment.Center
-                    rgbLabel.ZIndex = 1001
+                    rgbLabel.ZIndex = 5501
                     rgbLabel.Parent = pickerWindow
                     
                     local function updateRGBLabel()
@@ -2671,7 +2675,7 @@ function ClaudeUI:CreateWindow(config)
                     end
                     
                     local function updateSelectors()
-                        colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
+                        colorSelector.Position = UDim2.new(1 - s, 0, 1 - v, 0)
                         hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
                     end
                     
@@ -2685,7 +2689,7 @@ function ClaudeUI:CreateWindow(config)
                     gradientInput.BackgroundTransparency = 1
                     gradientInput.Size = UDim2.new(1, 0, 1, 0)
                     gradientInput.Text = ""
-                    gradientInput.ZIndex = 1003
+                    gradientInput.ZIndex = 5503
                     gradientInput.Parent = gradientFrame
                     
                     gradientInput.InputBegan:Connect(function(input)
@@ -2693,7 +2697,7 @@ function ClaudeUI:CreateWindow(config)
                             draggingGradient = true
                             local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
                             local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
-                            s = relX
+                            s = 1 - relX
                             v = 1 - relY
                             updateColor()
                             updateSelectors()
@@ -2711,7 +2715,7 @@ function ClaudeUI:CreateWindow(config)
                     hueInput.BackgroundTransparency = 1
                     hueInput.Size = UDim2.new(1, 0, 1, 0)
                     hueInput.Text = ""
-                    hueInput.ZIndex = 1002
+                    hueInput.ZIndex = 5502
                     hueInput.Parent = hueFrame
                     
                     hueInput.InputBegan:Connect(function(input)
@@ -2735,7 +2739,7 @@ function ClaudeUI:CreateWindow(config)
                             if draggingGradient then
                                 local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
                                 local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
-                                s = relX
+                                s = 1 - relX
                                 v = 1 - relY
                                 updateColor()
                                 updateSelectors()
