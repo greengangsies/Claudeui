@@ -2259,8 +2259,9 @@ function ClaudeUI:CreateWindow(config)
 -- END OF PART 4
 -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
+
             -- COLOR PICKER ELEMENT
-            -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+            -- ═══════════════════════════════════════════════════════════════════
             
             function Section:CreateColorPicker(colorConfig)
                 colorConfig = Utility.Merge({
@@ -2274,6 +2275,8 @@ function ClaudeUI:CreateWindow(config)
                 local currentColor = colorConfig.Default
                 local isOpen = false
                 local h, s, v = currentColor:ToHSV()
+                local pickerWindow = nil
+                local inputConnections = {}
                 
                 local colorFrame = Instance.new("Frame")
                 colorFrame.Name = colorConfig.Title
@@ -2281,7 +2284,6 @@ function ClaudeUI:CreateWindow(config)
                 colorFrame.Size = UDim2.new(1, 0, 0, colorConfig.Description and 52 or 36)
                 colorFrame.LayoutOrder = colorConfig.LayoutOrder
                 colorFrame.ClipsDescendants = false
-                colorFrame.ZIndex = 5
                 colorFrame.Parent = contentFrame
                 
                 local colorLabel = Instance.new("TextLabel")
@@ -2294,7 +2296,6 @@ function ClaudeUI:CreateWindow(config)
                 colorLabel.TextColor3 = theme.TextPrimary
                 colorLabel.TextSize = theme.FontSizeMD
                 colorLabel.TextXAlignment = Enum.TextXAlignment.Left
-                colorLabel.ZIndex = 5
                 colorLabel.Parent = colorFrame
                 
                 if colorConfig.Description then
@@ -2308,7 +2309,6 @@ function ClaudeUI:CreateWindow(config)
                     colorDesc.TextColor3 = theme.TextTertiary
                     colorDesc.TextSize = theme.FontSizeSM
                     colorDesc.TextXAlignment = Enum.TextXAlignment.Left
-                    colorDesc.ZIndex = 5
                     colorDesc.Parent = colorFrame
                 end
                 
@@ -2321,7 +2321,6 @@ function ClaudeUI:CreateWindow(config)
                 previewButton.AnchorPoint = Vector2.new(1, 0.5)
                 previewButton.Text = ""
                 previewButton.AutoButtonColor = false
-                previewButton.ZIndex = 5
                 previewButton.Parent = colorFrame
                 
                 local previewCorner = Instance.new("UICorner")
@@ -2333,216 +2332,400 @@ function ClaudeUI:CreateWindow(config)
                 previewStroke.Thickness = 1
                 previewStroke.Parent = previewButton
                 
-                local pickerFrame = Instance.new("Frame")
-                pickerFrame.Name = "Picker"
-                pickerFrame.BackgroundColor3 = theme.BackgroundElevated
-                pickerFrame.BorderSizePixel = 0
-                pickerFrame.Size = UDim2.new(0, 220, 0, 0)
-                pickerFrame.Position = UDim2.new(1, 0, 1, 8)
-                pickerFrame.AnchorPoint = Vector2.new(1, 0)
-                pickerFrame.Visible = false
-                pickerFrame.ClipsDescendants = true
-                pickerFrame.ZIndex = 50
-                pickerFrame.Parent = previewButton
+                local function closePicker()
+                    if pickerWindow then
+                        Animation.Tween(pickerWindow, {Size = UDim2.new(0, 240, 0, 0)}, 0.15)
+                        task.delay(0.15, function()
+                            if pickerWindow then
+                                pickerWindow:Destroy()
+                                pickerWindow = nil
+                            end
+                        end)
+                    end
+                    for _, conn in ipairs(inputConnections) do
+                        conn:Disconnect()
+                    end
+                    inputConnections = {}
+                    isOpen = false
+                    Animation.Tween(previewStroke, {Color = theme.Border}, 0.15)
+                end
                 
-                local pickerCorner = Instance.new("UICorner")
-                pickerCorner.CornerRadius = UDim.new(0, theme.RadiusLG)
-                pickerCorner.Parent = pickerFrame
-                
-                local pickerStroke = Instance.new("UIStroke")
-                pickerStroke.Color = theme.Border
-                pickerStroke.Thickness = 1
-                pickerStroke.Parent = pickerFrame
-                
-                local gradientFrame = Instance.new("Frame")
-                gradientFrame.Name = "Gradient"
-                gradientFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
-                gradientFrame.BorderSizePixel = 0
-                gradientFrame.Size = UDim2.new(1, -16, 0, 140)
-                gradientFrame.Position = UDim2.new(0, 8, 0, 8)
-                gradientFrame.ZIndex = 51
-                gradientFrame.Parent = pickerFrame
-                
-                local gradientCorner = Instance.new("UICorner")
-                gradientCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
-                gradientCorner.Parent = gradientFrame
-                
-                local whiteGradient = Instance.new("UIGradient")
-                whiteGradient.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-                    ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
-                })
-                whiteGradient.Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 0),
-                    NumberSequenceKeypoint.new(1, 1)
-                })
-                whiteGradient.Parent = gradientFrame
-                
-                local blackOverlay = Instance.new("Frame")
-                blackOverlay.Name = "BlackOverlay"
-                blackOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
-                blackOverlay.BorderSizePixel = 0
-                blackOverlay.Size = UDim2.new(1, 0, 1, 0)
-                blackOverlay.ZIndex = 52
-                blackOverlay.Parent = gradientFrame
-                
-                local blackCorner = Instance.new("UICorner")
-                blackCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
-                blackCorner.Parent = blackOverlay
-                
-                local blackGradient = Instance.new("UIGradient")
-                blackGradient.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
-                    ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
-                })
-                blackGradient.Transparency = NumberSequence.new({
-                    NumberSequenceKeypoint.new(0, 1),
-                    NumberSequenceKeypoint.new(1, 0)
-                })
-                blackGradient.Rotation = 90
-                blackGradient.Parent = blackOverlay
-                
-                local colorSelector = Instance.new("Frame")
-                colorSelector.Name = "Selector"
-                colorSelector.BackgroundColor3 = currentColor
-                colorSelector.BorderSizePixel = 0
-                colorSelector.Size = UDim2.new(0, 16, 0, 16)
-                colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
-                colorSelector.AnchorPoint = Vector2.new(0.5, 0.5)
-                colorSelector.ZIndex = 53
-                colorSelector.Parent = gradientFrame
-                
-                local selectorCorner = Instance.new("UICorner")
-                selectorCorner.CornerRadius = UDim.new(1, 0)
-                selectorCorner.Parent = colorSelector
-                
-                local selectorStroke = Instance.new("UIStroke")
-                selectorStroke.Color = Color3.new(1, 1, 1)
-                selectorStroke.Thickness = 2
-                selectorStroke.Parent = colorSelector
-                
-                local hueFrame = Instance.new("Frame")
-                hueFrame.Name = "HueSlider"
-                hueFrame.BackgroundColor3 = Color3.new(1, 1, 1)
-                hueFrame.BorderSizePixel = 0
-                hueFrame.Size = UDim2.new(1, -16, 0, 16)
-                hueFrame.Position = UDim2.new(0, 8, 0, 156)
-                hueFrame.ZIndex = 51
-                hueFrame.Parent = pickerFrame
-                
-                local hueCorner = Instance.new("UICorner")
-                hueCorner.CornerRadius = UDim.new(1, 0)
-                hueCorner.Parent = hueFrame
-                
-                local hueGradient = Instance.new("UIGradient")
-                hueGradient.Color = ColorSequence.new({
-                    ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
-                    ColorSequenceKeypoint.new(0.167, Color3.fromHSV(0.167, 1, 1)),
-                    ColorSequenceKeypoint.new(0.333, Color3.fromHSV(0.333, 1, 1)),
-                    ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0.5, 1, 1)),
-                    ColorSequenceKeypoint.new(0.667, Color3.fromHSV(0.667, 1, 1)),
-                    ColorSequenceKeypoint.new(0.833, Color3.fromHSV(0.833, 1, 1)),
-                    ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1)),
-                })
-                hueGradient.Parent = hueFrame
-                
-                local hueSelector = Instance.new("Frame")
-                hueSelector.Name = "Selector"
-                hueSelector.BackgroundColor3 = Color3.new(1, 1, 1)
-                hueSelector.BorderSizePixel = 0
-                hueSelector.Size = UDim2.new(0, 8, 0, 20)
-                hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
-                hueSelector.AnchorPoint = Vector2.new(0.5, 0.5)
-                hueSelector.ZIndex = 52
-                hueSelector.Parent = hueFrame
-                
-                local hueSelectorCorner = Instance.new("UICorner")
-                hueSelectorCorner.CornerRadius = UDim.new(0, 2)
-                hueSelectorCorner.Parent = hueSelector
-                
-                local hueSelectorStroke = Instance.new("UIStroke")
-                hueSelectorStroke.Color = theme.Border
-                hueSelectorStroke.Thickness = 1
-                hueSelectorStroke.Parent = hueSelector
-                
-                local function updateColor()
-                    currentColor = Color3.fromHSV(h, s, v)
-                    previewButton.BackgroundColor3 = currentColor
-                    colorSelector.BackgroundColor3 = currentColor
+                local function openPicker()
+                    if isOpen then return end
+                    isOpen = true
+                    
+                    Animation.Tween(previewStroke, {Color = theme.Primary}, 0.15)
+                    
+                    -- Get screen position of the preview button
+                    local buttonPos = previewButton.AbsolutePosition
+                    local buttonSize = previewButton.AbsoluteSize
+                    local screenSize = workspace.CurrentCamera.ViewportSize
+                    
+                    -- Calculate position
+                    local pickerWidth = 240
+                    local pickerHeight = 280
+                    local padding = 8
+                    
+                    local posX = buttonPos.X + buttonSize.X - pickerWidth
+                    local posY = buttonPos.Y + buttonSize.Y + padding
+                    
+                    -- Adjust if off screen
+                    if posX < padding then
+                        posX = padding
+                    end
+                    if posX + pickerWidth > screenSize.X - padding then
+                        posX = screenSize.X - pickerWidth - padding
+                    end
+                    if posY + pickerHeight > screenSize.Y - padding then
+                        posY = buttonPos.Y - pickerHeight - padding
+                    end
+                    if posY < padding then
+                        posY = padding
+                    end
+                    
+                    -- Create picker window in ScreenGui
+                    pickerWindow = Instance.new("Frame")
+                    pickerWindow.Name = "ColorPickerWindow"
+                    pickerWindow.BackgroundColor3 = theme.BackgroundElevated
+                    pickerWindow.BorderSizePixel = 0
+                    pickerWindow.Size = UDim2.new(0, pickerWidth, 0, 0)
+                    pickerWindow.Position = UDim2.new(0, posX, 0, posY)
+                    pickerWindow.ClipsDescendants = true
+                    pickerWindow.ZIndex = 1000
+                    pickerWindow.Parent = ClaudeUI._screenGui
+                    
+                    local windowCorner = Instance.new("UICorner")
+                    windowCorner.CornerRadius = UDim.new(0, theme.RadiusLG)
+                    windowCorner.Parent = pickerWindow
+                    
+                    local windowStroke = Instance.new("UIStroke")
+                    windowStroke.Color = theme.Border
+                    windowStroke.Thickness = 1
+                    windowStroke.Parent = pickerWindow
+                    
+                    -- Header
+                    local header = Instance.new("Frame")
+                    header.Name = "Header"
+                    header.BackgroundTransparency = 1
+                    header.Size = UDim2.new(1, 0, 0, 36)
+                    header.ZIndex = 1001
+                    header.Parent = pickerWindow
+                    
+                    local headerTitle = Instance.new("TextLabel")
+                    headerTitle.Name = "Title"
+                    headerTitle.BackgroundTransparency = 1
+                    headerTitle.Size = UDim2.new(1, -40, 1, 0)
+                    headerTitle.Position = UDim2.new(0, 12, 0, 0)
+                    headerTitle.Font = theme.FontFamilyHeading
+                    headerTitle.Text = colorConfig.Title
+                    headerTitle.TextColor3 = theme.TextPrimary
+                    headerTitle.TextSize = theme.FontSizeMD
+                    headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+                    headerTitle.ZIndex = 1001
+                    headerTitle.Parent = header
+                    
+                    local closeBtn = Instance.new("TextButton")
+                    closeBtn.Name = "Close"
+                    closeBtn.BackgroundTransparency = 1
+                    closeBtn.Size = UDim2.new(0, 28, 0, 28)
+                    closeBtn.Position = UDim2.new(1, -6, 0, 4)
+                    closeBtn.AnchorPoint = Vector2.new(1, 0)
+                    closeBtn.Text = "×"
+                    closeBtn.TextColor3 = theme.TextSecondary
+                    closeBtn.TextSize = 20
+                    closeBtn.Font = Enum.Font.GothamBold
+                    closeBtn.ZIndex = 1002
+                    closeBtn.Parent = header
+                    
+                    closeBtn.MouseButton1Click:Connect(closePicker)
+                    closeBtn.MouseEnter:Connect(function()
+                        closeBtn.TextColor3 = theme.TextPrimary
+                    end)
+                    closeBtn.MouseLeave:Connect(function()
+                        closeBtn.TextColor3 = theme.TextSecondary
+                    end)
+                    
+                    -- Current color preview
+                    local currentPreview = Instance.new("Frame")
+                    currentPreview.Name = "CurrentPreview"
+                    currentPreview.BackgroundColor3 = currentColor
+                    currentPreview.BorderSizePixel = 0
+                    currentPreview.Size = UDim2.new(1, -24, 0, 24)
+                    currentPreview.Position = UDim2.new(0, 12, 0, 40)
+                    currentPreview.ZIndex = 1001
+                    currentPreview.Parent = pickerWindow
+                    
+                    local currentPreviewCorner = Instance.new("UICorner")
+                    currentPreviewCorner.CornerRadius = UDim.new(0, theme.RadiusSM)
+                    currentPreviewCorner.Parent = currentPreview
+                    
+                    local currentPreviewStroke = Instance.new("UIStroke")
+                    currentPreviewStroke.Color = theme.Border
+                    currentPreviewStroke.Thickness = 1
+                    currentPreviewStroke.Parent = currentPreview
+                    
+                    -- Saturation/Value gradient box
+                    local gradientFrame = Instance.new("Frame")
+                    gradientFrame.Name = "Gradient"
                     gradientFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
-                    colorConfig.Callback(currentColor)
-                end
-                
-                local function updateSelectors()
+                    gradientFrame.BorderSizePixel = 0
+                    gradientFrame.Size = UDim2.new(1, -24, 0, 140)
+                    gradientFrame.Position = UDim2.new(0, 12, 0, 72)
+                    gradientFrame.ZIndex = 1001
+                    gradientFrame.Parent = pickerWindow
+                    
+                    local gradientCorner = Instance.new("UICorner")
+                    gradientCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
+                    gradientCorner.Parent = gradientFrame
+                    
+                    local whiteGradient = Instance.new("UIGradient")
+                    whiteGradient.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
+                        ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
+                    })
+                    whiteGradient.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 1)
+                    })
+                    whiteGradient.Parent = gradientFrame
+                    
+                    local blackOverlay = Instance.new("Frame")
+                    blackOverlay.Name = "BlackOverlay"
+                    blackOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
+                    blackOverlay.BorderSizePixel = 0
+                    blackOverlay.Size = UDim2.new(1, 0, 1, 0)
+                    blackOverlay.ZIndex = 1002
+                    blackOverlay.Parent = gradientFrame
+                    
+                    local blackCorner = Instance.new("UICorner")
+                    blackCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
+                    blackCorner.Parent = blackOverlay
+                    
+                    local blackGradient = Instance.new("UIGradient")
+                    blackGradient.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
+                        ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
+                    })
+                    blackGradient.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(1, 0)
+                    })
+                    blackGradient.Rotation = 90
+                    blackGradient.Parent = blackOverlay
+                    
+                    local colorSelector = Instance.new("Frame")
+                    colorSelector.Name = "Selector"
+                    colorSelector.BackgroundColor3 = currentColor
+                    colorSelector.BorderSizePixel = 0
+                    colorSelector.Size = UDim2.new(0, 18, 0, 18)
                     colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
+                    colorSelector.AnchorPoint = Vector2.new(0.5, 0.5)
+                    colorSelector.ZIndex = 1004
+                    colorSelector.Parent = gradientFrame
+                    
+                    local selectorCorner = Instance.new("UICorner")
+                    selectorCorner.CornerRadius = UDim.new(1, 0)
+                    selectorCorner.Parent = colorSelector
+                    
+                    local selectorStroke = Instance.new("UIStroke")
+                    selectorStroke.Color = Color3.new(1, 1, 1)
+                    selectorStroke.Thickness = 2
+                    selectorStroke.Parent = colorSelector
+                    
+                    -- Hue slider
+                    local hueFrame = Instance.new("Frame")
+                    hueFrame.Name = "HueSlider"
+                    hueFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+                    hueFrame.BorderSizePixel = 0
+                    hueFrame.Size = UDim2.new(1, -24, 0, 20)
+                    hueFrame.Position = UDim2.new(0, 12, 0, 220)
+                    hueFrame.ZIndex = 1001
+                    hueFrame.Parent = pickerWindow
+                    
+                    local hueCorner = Instance.new("UICorner")
+                    hueCorner.CornerRadius = UDim.new(0, 4)
+                    hueCorner.Parent = hueFrame
+                    
+                    local hueGradient = Instance.new("UIGradient")
+                    hueGradient.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.fromHSV(0, 1, 1)),
+                        ColorSequenceKeypoint.new(0.167, Color3.fromHSV(0.167, 1, 1)),
+                        ColorSequenceKeypoint.new(0.333, Color3.fromHSV(0.333, 1, 1)),
+                        ColorSequenceKeypoint.new(0.5, Color3.fromHSV(0.5, 1, 1)),
+                        ColorSequenceKeypoint.new(0.667, Color3.fromHSV(0.667, 1, 1)),
+                        ColorSequenceKeypoint.new(0.833, Color3.fromHSV(0.833, 1, 1)),
+                        ColorSequenceKeypoint.new(1, Color3.fromHSV(1, 1, 1)),
+                    })
+                    hueGradient.Parent = hueFrame
+                    
+                    local hueSelector = Instance.new("Frame")
+                    hueSelector.Name = "HueSelector"
+                    hueSelector.BackgroundColor3 = Color3.new(1, 1, 1)
+                    hueSelector.BorderSizePixel = 0
+                    hueSelector.Size = UDim2.new(0, 8, 0, 26)
                     hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
-                end
-                
-                local draggingGradient = false
-                local draggingHue = false
-                
-                gradientFrame.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        draggingGradient = true
-                        local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
-                        local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
-                        s = relX
-                        v = 1 - relY
-                        updateColor()
-                        updateSelectors()
+                    hueSelector.AnchorPoint = Vector2.new(0.5, 0.5)
+                    hueSelector.ZIndex = 1003
+                    hueSelector.Parent = hueFrame
+                    
+                    local hueSelectorCorner = Instance.new("UICorner")
+                    hueSelectorCorner.CornerRadius = UDim.new(0, 3)
+                    hueSelectorCorner.Parent = hueSelector
+                    
+                    local hueSelectorStroke = Instance.new("UIStroke")
+                    hueSelectorStroke.Color = theme.Border
+                    hueSelectorStroke.Thickness = 1
+                    hueSelectorStroke.Parent = hueSelector
+                    
+                    -- RGB/Hex display
+                    local rgbLabel = Instance.new("TextLabel")
+                    rgbLabel.Name = "RGBLabel"
+                    rgbLabel.BackgroundTransparency = 1
+                    rgbLabel.Size = UDim2.new(1, -24, 0, 20)
+                    rgbLabel.Position = UDim2.new(0, 12, 0, 248)
+                    rgbLabel.Font = theme.FontFamilyMono
+                    rgbLabel.TextColor3 = theme.TextSecondary
+                    rgbLabel.TextSize = theme.FontSizeSM
+                    rgbLabel.TextXAlignment = Enum.TextXAlignment.Center
+                    rgbLabel.ZIndex = 1001
+                    rgbLabel.Parent = pickerWindow
+                    
+                    local function updateRGBLabel()
+                        local r = math.floor(currentColor.R * 255)
+                        local g = math.floor(currentColor.G * 255)
+                        local b = math.floor(currentColor.B * 255)
+                        rgbLabel.Text = string.format("RGB(%d, %d, %d)  #%02X%02X%02X", r, g, b, r, g, b)
                     end
-                end)
-                
-                gradientFrame.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        draggingGradient = false
+                    
+                    local function updateColor()
+                        currentColor = Color3.fromHSV(h, s, v)
+                        previewButton.BackgroundColor3 = currentColor
+                        currentPreview.BackgroundColor3 = currentColor
+                        colorSelector.BackgroundColor3 = currentColor
+                        gradientFrame.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+                        updateRGBLabel()
+                        colorConfig.Callback(currentColor)
                     end
-                end)
-                
-                hueFrame.InputBegan:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        draggingHue = true
-                        local relX = Utility.Clamp((input.Position.X - hueFrame.AbsolutePosition.X) / hueFrame.AbsoluteSize.X, 0, 1)
-                        h = relX
-                        updateColor()
-                        updateSelectors()
+                    
+                    local function updateSelectors()
+                        colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
+                        hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
                     end
-                end)
-                
-                hueFrame.InputEnded:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                        draggingHue = false
-                    end
-                end)
-                
-                UserInputService.InputChanged:Connect(function(input)
-                    if input.UserInputType == Enum.UserInputType.MouseMovement then
-                        if draggingGradient then
+                    
+                    updateRGBLabel()
+                    
+                    local draggingGradient = false
+                    local draggingHue = false
+                    
+                    local gradientInput = Instance.new("TextButton")
+                    gradientInput.Name = "GradientInput"
+                    gradientInput.BackgroundTransparency = 1
+                    gradientInput.Size = UDim2.new(1, 0, 1, 0)
+                    gradientInput.Text = ""
+                    gradientInput.ZIndex = 1003
+                    gradientInput.Parent = gradientFrame
+                    
+                    gradientInput.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            draggingGradient = true
                             local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
                             local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
                             s = relX
                             v = 1 - relY
                             updateColor()
                             updateSelectors()
-                        elseif draggingHue then
+                        end
+                    end)
+                    
+                    gradientInput.InputEnded:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            draggingGradient = false
+                        end
+                    end)
+                    
+                    local hueInput = Instance.new("TextButton")
+                    hueInput.Name = "HueInput"
+                    hueInput.BackgroundTransparency = 1
+                    hueInput.Size = UDim2.new(1, 0, 1, 0)
+                    hueInput.Text = ""
+                    hueInput.ZIndex = 1002
+                    hueInput.Parent = hueFrame
+                    
+                    hueInput.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            draggingHue = true
                             local relX = Utility.Clamp((input.Position.X - hueFrame.AbsolutePosition.X) / hueFrame.AbsoluteSize.X, 0, 1)
                             h = relX
                             updateColor()
                             updateSelectors()
                         end
-                    end
-                end)
+                    end)
+                    
+                    hueInput.InputEnded:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            draggingHue = false
+                        end
+                    end)
+                    
+                    local inputConn = UserInputService.InputChanged:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                            if draggingGradient then
+                                local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
+                                local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
+                                s = relX
+                                v = 1 - relY
+                                updateColor()
+                                updateSelectors()
+                            elseif draggingHue then
+                                local relX = Utility.Clamp((input.Position.X - hueFrame.AbsolutePosition.X) / hueFrame.AbsoluteSize.X, 0, 1)
+                                h = relX
+                                updateColor()
+                                updateSelectors()
+                            end
+                        end
+                    end)
+                    table.insert(inputConnections, inputConn)
+                    
+                    local releaseConn = UserInputService.InputEnded:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                            draggingGradient = false
+                            draggingHue = false
+                        end
+                    end)
+                    table.insert(inputConnections, releaseConn)
+                    
+                    local clickConn = UserInputService.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                            task.delay(0.05, function()
+                                if not pickerWindow then return end
+                                local mousePos = UserInputService:GetMouseLocation()
+                                local windowPos = pickerWindow.AbsolutePosition
+                                local windowSize = pickerWindow.AbsoluteSize
+                                
+                                local inWindow = mousePos.X >= windowPos.X and mousePos.X <= windowPos.X + windowSize.X and
+                                               mousePos.Y >= windowPos.Y and mousePos.Y <= windowPos.Y + windowSize.Y
+                                
+                                local buttonPos = previewButton.AbsolutePosition
+                                local buttonSize = previewButton.AbsoluteSize
+                                local inButton = mousePos.X >= buttonPos.X and mousePos.X <= buttonPos.X + buttonSize.X and
+                                               mousePos.Y >= buttonPos.Y and mousePos.Y <= buttonPos.Y + buttonSize.Y
+                                
+                                if not inWindow and not inButton and not draggingGradient and not draggingHue then
+                                    closePicker()
+                                end
+                            end)
+                        end
+                    end)
+                    table.insert(inputConnections, clickConn)
+                    
+                    Animation.Tween(pickerWindow, {Size = UDim2.new(0, pickerWidth, 0, pickerHeight)}, 0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+                end
                 
                 previewButton.MouseButton1Click:Connect(function()
-                    isOpen = not isOpen
                     if isOpen then
-                        pickerFrame.Visible = true
-                        Animation.Tween(pickerFrame, {Size = UDim2.new(0, 220, 0, 188)}, 0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
+                        closePicker()
                     else
-                        Animation.Tween(pickerFrame, {Size = UDim2.new(0, 220, 0, 0)}, 0.2)
-                        task.delay(0.2, function()
-                            if not isOpen then pickerFrame.Visible = false end
-                        end)
+                        openPicker()
                     end
                 end)
                 
@@ -2551,20 +2734,17 @@ function ClaudeUI:CreateWindow(config)
                     currentColor = color
                     h, s, v = color:ToHSV()
                     previewButton.BackgroundColor3 = color
-                    if isOpen then
-                        updateColor()
-                        updateSelectors()
-                    end
                 end
                 function ColorAPI:Get()
                     return currentColor
+                end
+                function ColorAPI:Close()
+                    closePicker()
                 end
                 
                 table.insert(self.Elements, colorFrame)
                 return ColorAPI
             end
-            
-            -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             -- KEYBIND ELEMENT
             -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             
