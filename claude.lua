@@ -519,10 +519,9 @@ local Icons = {
 }
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- CLAUDE UI - PART 2: Main Library & Window System
+-- END OF PART 1
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- MAIN LIBRARY
 local ClaudeUI = {}
 ClaudeUI.__index = ClaudeUI
 ClaudeUI.Version = VERSION
@@ -1116,10 +1115,9 @@ function ClaudeUI:CreateWindow(config)
     end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- CLAUDE UI - PART 3: Tab System, Sections, Button & Toggle Elements
+-- END OF PART 2
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-    -- Create Tab Method (continues from Window in Part 2)
     function Window:CreateTab(tabConfig)
         tabConfig = Utility.Merge({
             Title = "Tab",
@@ -1659,10 +1657,9 @@ function ClaudeUI:CreateWindow(config)
             end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- CLAUDE UI - PART 4: Slider, Input, Dropdown Elements
+-- END OF PART 3
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-            -- ═══════════════════════════════════════════════════════════════
             -- SLIDER ELEMENT
             -- ═══════════════════════════════════════════════════════════════
             
@@ -2271,10 +2268,9 @@ function ClaudeUI:CreateWindow(config)
             end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- CLAUDE UI - PART 5: ColorPicker, Keybind, Label, Paragraph, Divider
+-- END OF PART 4
 -- ═══════════════════════════════════════════════════════════════════════════════
 
-            -- ═══════════════════════════════════════════════════════════════
             -- COLOR PICKER ELEMENT
             -- ═══════════════════════════════════════════════════════════════
             
@@ -2810,10 +2806,9 @@ function ClaudeUI:CreateWindow(config)
 end
 
 -- ═══════════════════════════════════════════════════════════════════════════════
--- CLAUDE UI - PART 6: Toast, Modal, ContextMenu, Tooltip, Utilities, Cleanup
+-- END OF PART 5
 -- ═══════════════════════════════════════════════════════════════════════════════
 
--- ═══════════════════════════════════════════════════════════════════════════════
 -- TOAST NOTIFICATIONS
 -- ═══════════════════════════════════════════════════════════════════════════════
 
