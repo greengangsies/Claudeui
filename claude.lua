@@ -266,7 +266,7 @@ Theme.Presets = {
         SpacingXS = 4, SpacingSM = 8, SpacingMD = 12, SpacingLG = 16, SpacingXL = 24, Spacing2XL = 32,
         RadiusSM = 4, RadiusMD = 6, RadiusLG = 8, RadiusXL = 12, Radius2XL = 16, RadiusFull = 9999,
         TransitionFast = 0.15, TransitionNormal = 0.25, TransitionSlow = 0.35,
-        ZIndexDropdown = 100, ZIndexModal = 200, ZIndexToast = 300, ZIndexTooltip = 400,
+        ZIndexDropdown = 5000, ZIndexModal = 6000, ZIndexToast = 7000, ZIndexTooltip = 8000,
     },
     
     Light = {
@@ -317,7 +317,7 @@ Theme.Presets = {
         SpacingXS = 4, SpacingSM = 8, SpacingMD = 12, SpacingLG = 16, SpacingXL = 24, Spacing2XL = 32,
         RadiusSM = 4, RadiusMD = 6, RadiusLG = 8, RadiusXL = 12, Radius2XL = 16, RadiusFull = 9999,
         TransitionFast = 0.15, TransitionNormal = 0.25, TransitionSlow = 0.35,
-        ZIndexDropdown = 100, ZIndexModal = 200, ZIndexToast = 300, ZIndexTooltip = 400,
+        ZIndexDropdown = 5000, ZIndexModal = 6000, ZIndexToast = 7000, ZIndexTooltip = 8000,
     },
     
     Midnight = {
@@ -368,7 +368,7 @@ Theme.Presets = {
         SpacingXS = 4, SpacingSM = 8, SpacingMD = 12, SpacingLG = 16, SpacingXL = 24, Spacing2XL = 32,
         RadiusSM = 4, RadiusMD = 6, RadiusLG = 8, RadiusXL = 12, Radius2XL = 16, RadiusFull = 9999,
         TransitionFast = 0.15, TransitionNormal = 0.25, TransitionSlow = 0.35,
-        ZIndexDropdown = 100, ZIndexModal = 200, ZIndexToast = 300, ZIndexTooltip = 400,
+        ZIndexDropdown = 5000, ZIndexModal = 6000, ZIndexToast = 7000, ZIndexTooltip = 8000,
     },
     
     Emerald = {
@@ -419,7 +419,7 @@ Theme.Presets = {
         SpacingXS = 4, SpacingSM = 8, SpacingMD = 12, SpacingLG = 16, SpacingXL = 24, Spacing2XL = 32,
         RadiusSM = 4, RadiusMD = 6, RadiusLG = 8, RadiusXL = 12, Radius2XL = 16, RadiusFull = 9999,
         TransitionFast = 0.15, TransitionNormal = 0.25, TransitionSlow = 0.35,
-        ZIndexDropdown = 100, ZIndexModal = 200, ZIndexToast = 300, ZIndexTooltip = 400,
+        ZIndexDropdown = 5000, ZIndexModal = 6000, ZIndexToast = 7000, ZIndexTooltip = 8000,
     },
 }
 
@@ -1947,6 +1947,10 @@ function ClaudeUI:CreateWindow(config)
             -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
             -- DROPDOWN ELEMENT
             -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+
+            -- ═══════════════════════════════════════════════════════════════════
+            -- DROPDOWN ELEMENT
+            -- ═══════════════════════════════════════════════════════════════════
             
             function Section:CreateDropdown(dropdownConfig)
                 dropdownConfig = Utility.Merge({
@@ -1961,6 +1965,8 @@ function ClaudeUI:CreateWindow(config)
                 
                 local isOpen = false
                 local selectedValues = {}
+                local optionsWindow = nil
+                local inputConnections = {}
                 
                 if dropdownConfig.Default then
                     if dropdownConfig.MultiSelect and type(dropdownConfig.Default) == "table" then
@@ -1976,7 +1982,6 @@ function ClaudeUI:CreateWindow(config)
                 dropdownFrame.Size = UDim2.new(1, 0, 0, dropdownConfig.Description and 72 or 56)
                 dropdownFrame.LayoutOrder = dropdownConfig.LayoutOrder
                 dropdownFrame.ClipsDescendants = false
-                dropdownFrame.ZIndex = 10
                 dropdownFrame.Parent = contentFrame
                 
                 local dropdownLabel = Instance.new("TextLabel")
@@ -1988,7 +1993,6 @@ function ClaudeUI:CreateWindow(config)
                 dropdownLabel.TextColor3 = theme.TextPrimary
                 dropdownLabel.TextSize = theme.FontSizeMD
                 dropdownLabel.TextXAlignment = Enum.TextXAlignment.Left
-                dropdownLabel.ZIndex = 10
                 dropdownLabel.Parent = dropdownFrame
                 
                 if dropdownConfig.Description then
@@ -2002,7 +2006,6 @@ function ClaudeUI:CreateWindow(config)
                     dropdownDesc.TextColor3 = theme.TextTertiary
                     dropdownDesc.TextSize = theme.FontSizeSM
                     dropdownDesc.TextXAlignment = Enum.TextXAlignment.Left
-                    dropdownDesc.ZIndex = 10
                     dropdownDesc.Parent = dropdownFrame
                 end
                 
@@ -2014,7 +2017,6 @@ function ClaudeUI:CreateWindow(config)
                 mainButton.Position = UDim2.new(0, 0, 1, -36)
                 mainButton.Text = ""
                 mainButton.AutoButtonColor = false
-                mainButton.ZIndex = 11
                 mainButton.Parent = dropdownFrame
                 
                 local mainCorner = Instance.new("UICorner")
@@ -2037,7 +2039,6 @@ function ClaudeUI:CreateWindow(config)
                 mainLabel.TextSize = theme.FontSizeMD
                 mainLabel.TextXAlignment = Enum.TextXAlignment.Left
                 mainLabel.TextTruncate = Enum.TextTruncate.AtEnd
-                mainLabel.ZIndex = 11
                 mainLabel.Parent = mainButton
                 
                 local chevron = Instance.new("ImageLabel")
@@ -2048,184 +2049,248 @@ function ClaudeUI:CreateWindow(config)
                 chevron.AnchorPoint = Vector2.new(0, 0.5)
                 chevron.Image = Icons.ChevronDown
                 chevron.ImageColor3 = theme.TextSecondary
-                chevron.ZIndex = 11
                 chevron.Parent = mainButton
-                
-                local optionsFrame = Instance.new("Frame")
-                optionsFrame.Name = "Options"
-                optionsFrame.BackgroundColor3 = theme.BackgroundElevated
-                optionsFrame.BorderSizePixel = 0
-                optionsFrame.Size = UDim2.new(1, 0, 0, 0)
-                optionsFrame.Position = UDim2.new(0, 0, 1, 4)
-                optionsFrame.ClipsDescendants = true
-                optionsFrame.Visible = false
-                optionsFrame.ZIndex = 100
-                optionsFrame.Parent = mainButton
-                
-                local optionsCorner = Instance.new("UICorner")
-                optionsCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
-                optionsCorner.Parent = optionsFrame
-                
-                local optionsStroke = Instance.new("UIStroke")
-                optionsStroke.Color = theme.Border
-                optionsStroke.Thickness = 1
-                optionsStroke.Parent = optionsFrame
-                
-                local optionsList = Instance.new("ScrollingFrame")
-                optionsList.Name = "List"
-                optionsList.BackgroundTransparency = 1
-                optionsList.Size = UDim2.new(1, 0, 1, 0)
-                optionsList.CanvasSize = UDim2.new(0, 0, 0, 0)
-                optionsList.ScrollBarThickness = 3
-                optionsList.ScrollBarImageColor3 = theme.ScrollbarThumb
-                optionsList.AutomaticCanvasSize = Enum.AutomaticSize.Y
-                optionsList.ZIndex = 101
-                optionsList.Parent = optionsFrame
-                
-                local optionsPadding = Instance.new("UIPadding")
-                optionsPadding.PaddingTop = UDim.new(0, 4)
-                optionsPadding.PaddingBottom = UDim.new(0, 4)
-                optionsPadding.PaddingLeft = UDim.new(0, 4)
-                optionsPadding.PaddingRight = UDim.new(0, 4)
-                optionsPadding.Parent = optionsList
-                
-                local optionsLayout = Instance.new("UIListLayout")
-                optionsLayout.SortOrder = Enum.SortOrder.LayoutOrder
-                optionsLayout.Padding = UDim.new(0, 2)
-                optionsLayout.Parent = optionsList
                 
                 local function updateDisplay()
                     mainLabel.Text = #selectedValues > 0 and table.concat(selectedValues, ", ") or "Select..."
                     mainLabel.TextColor3 = #selectedValues > 0 and theme.TextPrimary or theme.TextTertiary
                 end
                 
-                local function createOption(optionText, index)
-                    local isSelected = table.find(selectedValues, optionText) ~= nil
+                local function closeDropdown()
+                    if optionsWindow then
+                        Animation.Tween(optionsWindow, {Size = UDim2.new(0, optionsWindow.Size.X.Offset, 0, 0)}, 0.15)
+                        task.delay(0.15, function()
+                            if optionsWindow then
+                                optionsWindow:Destroy()
+                                optionsWindow = nil
+                            end
+                        end)
+                    end
+                    for _, conn in ipairs(inputConnections) do
+                        conn:Disconnect()
+                    end
+                    inputConnections = {}
+                    isOpen = false
+                    Animation.Tween(chevron, {Rotation = 0}, 0.2)
+                    Animation.Tween(mainStroke, {Color = theme.Border}, 0.15)
+                end
+                
+                local function openDropdown()
+                    if isOpen then return end
+                    isOpen = true
                     
-                    local optionButton = Instance.new("TextButton")
-                    optionButton.Name = optionText
-                    optionButton.BackgroundColor3 = isSelected and theme.Primary or theme.Surface
-                    optionButton.BackgroundTransparency = isSelected and 0.1 or 1
-                    optionButton.BorderSizePixel = 0
-                    optionButton.Size = UDim2.new(1, 0, 0, 32)
-                    optionButton.Text = ""
-                    optionButton.AutoButtonColor = false
-                    optionButton.LayoutOrder = index
-                    optionButton.ZIndex = 102
-                    optionButton.Parent = optionsList
+                    Animation.Tween(chevron, {Rotation = 180}, 0.2)
+                    Animation.Tween(mainStroke, {Color = theme.Primary}, 0.15)
                     
-                    local optionCorner = Instance.new("UICorner")
-                    optionCorner.CornerRadius = UDim.new(0, theme.RadiusSM)
-                    optionCorner.Parent = optionButton
+                    -- Get screen position of the main button
+                    local buttonPos = mainButton.AbsolutePosition
+                    local buttonSize = mainButton.AbsoluteSize
+                    local screenSize = workspace.CurrentCamera.ViewportSize
                     
-                    local optionLabel = Instance.new("TextLabel")
-                    optionLabel.Name = "Label"
-                    optionLabel.BackgroundTransparency = 1
-                    optionLabel.Size = UDim2.new(1, dropdownConfig.MultiSelect and -30 or -16, 1, 0)
-                    optionLabel.Position = UDim2.new(0, 8, 0, 0)
-                    optionLabel.Font = theme.FontFamily
-                    optionLabel.Text = optionText
-                    optionLabel.TextColor3 = isSelected and theme.Primary or theme.TextPrimary
-                    optionLabel.TextSize = theme.FontSizeMD
-                    optionLabel.TextXAlignment = Enum.TextXAlignment.Left
-                    optionLabel.ZIndex = 102
-                    optionLabel.Parent = optionButton
+                    -- Calculate dimensions
+                    local optionsWidth = buttonSize.X
+                    local maxHeight = math.min(#dropdownConfig.Options * 34 + 8, 250)
+                    local padding = 4
                     
-                    if dropdownConfig.MultiSelect then
-                        local checkbox = Instance.new("Frame")
-                        checkbox.Name = "Checkbox"
-                        checkbox.BackgroundColor3 = isSelected and theme.Primary or theme.Surface
-                        checkbox.BorderSizePixel = 0
-                        checkbox.Size = UDim2.new(0, 18, 0, 18)
-                        checkbox.Position = UDim2.new(1, -26, 0.5, 0)
-                        checkbox.AnchorPoint = Vector2.new(0, 0.5)
-                        checkbox.ZIndex = 102
-                        checkbox.Parent = optionButton
-                        
-                        local checkCorner = Instance.new("UICorner")
-                        checkCorner.CornerRadius = UDim.new(0, 4)
-                        checkCorner.Parent = checkbox
-                        
-                        local checkStroke = Instance.new("UIStroke")
-                        checkStroke.Color = isSelected and theme.Primary or theme.Border
-                        checkStroke.Thickness = 1
-                        checkStroke.Parent = checkbox
-                        
-                        if isSelected then
-                            local checkIcon = Instance.new("ImageLabel")
-                            checkIcon.Name = "Check"
-                            checkIcon.BackgroundTransparency = 1
-                            checkIcon.Size = UDim2.new(0, 12, 0, 12)
-                            checkIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
-                            checkIcon.AnchorPoint = Vector2.new(0.5, 0.5)
-                            checkIcon.Image = Icons.Check
-                            checkIcon.ImageColor3 = Color3.new(1, 1, 1)
-                            checkIcon.ZIndex = 103
-                            checkIcon.Parent = checkbox
-                        end
+                    local posX = buttonPos.X
+                    local posY = buttonPos.Y + buttonSize.Y + padding
+                    
+                    -- Adjust if off screen
+                    if posX + optionsWidth > screenSize.X - padding then
+                        posX = screenSize.X - optionsWidth - padding
+                    end
+                    if posY + maxHeight > screenSize.Y - padding then
+                        -- Open above instead
+                        posY = buttonPos.Y - maxHeight - padding
+                    end
+                    if posY < padding then
+                        posY = padding
                     end
                     
-                    optionButton.MouseEnter:Connect(function()
-                        Animation.Tween(optionButton, {BackgroundTransparency = 0, BackgroundColor3 = theme.SurfaceHover}, 0.1)
-                    end)
+                    -- Create options window in ScreenGui
+                    optionsWindow = Instance.new("Frame")
+                    optionsWindow.Name = "DropdownOptions"
+                    optionsWindow.BackgroundColor3 = theme.BackgroundElevated
+                    optionsWindow.BorderSizePixel = 0
+                    optionsWindow.Size = UDim2.new(0, optionsWidth, 0, 0)
+                    optionsWindow.Position = UDim2.new(0, posX, 0, posY)
+                    optionsWindow.ClipsDescendants = true
+                    optionsWindow.ZIndex = 5000
+                    optionsWindow.Parent = ClaudeUI._screenGui
                     
-                    optionButton.MouseLeave:Connect(function()
-                        local sel = table.find(selectedValues, optionText) ~= nil
-                        Animation.Tween(optionButton, {BackgroundTransparency = sel and 0.1 or 1, BackgroundColor3 = sel and theme.Primary or theme.Surface}, 0.1)
-                    end)
+                    local windowCorner = Instance.new("UICorner")
+                    windowCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
+                    windowCorner.Parent = optionsWindow
                     
-                    optionButton.MouseButton1Click:Connect(function()
+                    local windowStroke = Instance.new("UIStroke")
+                    windowStroke.Color = theme.Border
+                    windowStroke.Thickness = 1
+                    windowStroke.Parent = optionsWindow
+                    
+                    local optionsList = Instance.new("ScrollingFrame")
+                    optionsList.Name = "List"
+                    optionsList.BackgroundTransparency = 1
+                    optionsList.Size = UDim2.new(1, 0, 1, 0)
+                    optionsList.CanvasSize = UDim2.new(0, 0, 0, 0)
+                    optionsList.ScrollBarThickness = 3
+                    optionsList.ScrollBarImageColor3 = theme.ScrollbarThumb
+                    optionsList.AutomaticCanvasSize = Enum.AutomaticSize.Y
+                    optionsList.ZIndex = 5001
+                    optionsList.Parent = optionsWindow
+                    
+                    local optionsPadding = Instance.new("UIPadding")
+                    optionsPadding.PaddingTop = UDim.new(0, 4)
+                    optionsPadding.PaddingBottom = UDim.new(0, 4)
+                    optionsPadding.PaddingLeft = UDim.new(0, 4)
+                    optionsPadding.PaddingRight = UDim.new(0, 4)
+                    optionsPadding.Parent = optionsList
+                    
+                    local optionsLayout = Instance.new("UIListLayout")
+                    optionsLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                    optionsLayout.Padding = UDim.new(0, 2)
+                    optionsLayout.Parent = optionsList
+                    
+                    local function createOption(optionText, index)
+                        local isSelected = table.find(selectedValues, optionText) ~= nil
+                        
+                        local optionButton = Instance.new("TextButton")
+                        optionButton.Name = optionText
+                        optionButton.BackgroundColor3 = isSelected and theme.Primary or theme.Surface
+                        optionButton.BackgroundTransparency = isSelected and 0.1 or 1
+                        optionButton.BorderSizePixel = 0
+                        optionButton.Size = UDim2.new(1, 0, 0, 32)
+                        optionButton.Text = ""
+                        optionButton.AutoButtonColor = false
+                        optionButton.LayoutOrder = index
+                        optionButton.ZIndex = 5002
+                        optionButton.Parent = optionsList
+                        
+                        local optionCorner = Instance.new("UICorner")
+                        optionCorner.CornerRadius = UDim.new(0, theme.RadiusSM)
+                        optionCorner.Parent = optionButton
+                        
+                        local optionLabel = Instance.new("TextLabel")
+                        optionLabel.Name = "Label"
+                        optionLabel.BackgroundTransparency = 1
+                        optionLabel.Size = UDim2.new(1, dropdownConfig.MultiSelect and -30 or -16, 1, 0)
+                        optionLabel.Position = UDim2.new(0, 8, 0, 0)
+                        optionLabel.Font = theme.FontFamily
+                        optionLabel.Text = optionText
+                        optionLabel.TextColor3 = isSelected and theme.Primary or theme.TextPrimary
+                        optionLabel.TextSize = theme.FontSizeMD
+                        optionLabel.TextXAlignment = Enum.TextXAlignment.Left
+                        optionLabel.ZIndex = 5002
+                        optionLabel.Parent = optionButton
+                        
                         if dropdownConfig.MultiSelect then
-                            local idx = table.find(selectedValues, optionText)
-                            if idx then
-                                table.remove(selectedValues, idx)
+                            local checkbox = Instance.new("Frame")
+                            checkbox.Name = "Checkbox"
+                            checkbox.BackgroundColor3 = isSelected and theme.Primary or theme.Surface
+                            checkbox.BorderSizePixel = 0
+                            checkbox.Size = UDim2.new(0, 18, 0, 18)
+                            checkbox.Position = UDim2.new(1, -26, 0.5, 0)
+                            checkbox.AnchorPoint = Vector2.new(0, 0.5)
+                            checkbox.ZIndex = 5002
+                            checkbox.Parent = optionButton
+                            
+                            local checkCorner = Instance.new("UICorner")
+                            checkCorner.CornerRadius = UDim.new(0, 4)
+                            checkCorner.Parent = checkbox
+                            
+                            local checkStroke = Instance.new("UIStroke")
+                            checkStroke.Color = isSelected and theme.Primary or theme.Border
+                            checkStroke.Thickness = 1
+                            checkStroke.Parent = checkbox
+                            
+                            if isSelected then
+                                local checkIcon = Instance.new("ImageLabel")
+                                checkIcon.Name = "Check"
+                                checkIcon.BackgroundTransparency = 1
+                                checkIcon.Size = UDim2.new(0, 12, 0, 12)
+                                checkIcon.Position = UDim2.new(0.5, 0, 0.5, 0)
+                                checkIcon.AnchorPoint = Vector2.new(0.5, 0.5)
+                                checkIcon.Image = Icons.Check
+                                checkIcon.ImageColor3 = Color3.new(1, 1, 1)
+                                checkIcon.ZIndex = 5003
+                                checkIcon.Parent = checkbox
+                            end
+                        end
+                        
+                        optionButton.MouseEnter:Connect(function()
+                            Animation.Tween(optionButton, {BackgroundTransparency = 0, BackgroundColor3 = theme.SurfaceHover}, 0.1)
+                        end)
+                        
+                        optionButton.MouseLeave:Connect(function()
+                            local sel = table.find(selectedValues, optionText) ~= nil
+                            Animation.Tween(optionButton, {BackgroundTransparency = sel and 0.1 or 1, BackgroundColor3 = sel and theme.Primary or theme.Surface}, 0.1)
+                        end)
+                        
+                        optionButton.MouseButton1Click:Connect(function()
+                            if dropdownConfig.MultiSelect then
+                                local idx = table.find(selectedValues, optionText)
+                                if idx then
+                                    table.remove(selectedValues, idx)
+                                else
+                                    table.insert(selectedValues, optionText)
+                                end
+                                updateDisplay()
+                                dropdownConfig.Callback(selectedValues)
+                                -- Refresh options list
+                                for _, child in ipairs(optionsList:GetChildren()) do
+                                    if child:IsA("TextButton") then child:Destroy() end
+                                end
+                                for i, opt in ipairs(dropdownConfig.Options) do
+                                    createOption(opt, i)
+                                end
                             else
-                                table.insert(selectedValues, optionText)
+                                selectedValues = {optionText}
+                                updateDisplay()
+                                dropdownConfig.Callback(optionText)
+                                closeDropdown()
                             end
-                            updateDisplay()
-                            dropdownConfig.Callback(selectedValues)
-                            for _, child in ipairs(optionsList:GetChildren()) do
-                                if child:IsA("TextButton") then child:Destroy() end
-                            end
-                            for i, opt in ipairs(dropdownConfig.Options) do
-                                createOption(opt, i)
-                            end
-                        else
-                            selectedValues = {optionText}
-                            updateDisplay()
-                            dropdownConfig.Callback(optionText)
-                            isOpen = false
-                            Animation.Tween(chevron, {Rotation = 0}, 0.2)
-                            Animation.Tween(optionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2, Enum.EasingStyle.Quart)
-                            Animation.Tween(mainStroke, {Color = theme.Border}, 0.15)
-                            task.delay(0.2, function()
-                                if not isOpen then optionsFrame.Visible = false end
+                        end)
+                        
+                        return optionButton
+                    end
+                    
+                    for i, option in ipairs(dropdownConfig.Options) do
+                        createOption(option, i)
+                    end
+                    
+                    -- Click outside to close
+                    local clickConn = UserInputService.InputBegan:Connect(function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                            task.delay(0.05, function()
+                                if not optionsWindow then return end
+                                local mousePos = UserInputService:GetMouseLocation()
+                                local windowPos = optionsWindow.AbsolutePosition
+                                local windowSize = optionsWindow.AbsoluteSize
+                                
+                                local inWindow = mousePos.X >= windowPos.X and mousePos.X <= windowPos.X + windowSize.X and
+                                               mousePos.Y >= windowPos.Y and mousePos.Y <= windowPos.Y + windowSize.Y
+                                
+                                local btnPos = mainButton.AbsolutePosition
+                                local btnSize = mainButton.AbsoluteSize
+                                local inButton = mousePos.X >= btnPos.X and mousePos.X <= btnPos.X + btnSize.X and
+                                               mousePos.Y >= btnPos.Y and mousePos.Y <= btnPos.Y + btnSize.Y
+                                
+                                if not inWindow and not inButton then
+                                    closeDropdown()
+                                end
                             end)
                         end
                     end)
+                    table.insert(inputConnections, clickConn)
                     
-                    return optionButton
-                end
-                
-                for i, option in ipairs(dropdownConfig.Options) do
-                    createOption(option, i)
+                    -- Animate open
+                    Animation.Tween(optionsWindow, {Size = UDim2.new(0, optionsWidth, 0, maxHeight)}, 0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
                 end
                 
                 mainButton.MouseButton1Click:Connect(function()
-                    isOpen = not isOpen
                     if isOpen then
-                        optionsFrame.Visible = true
-                        local maxHeight = math.min(#dropdownConfig.Options * 34 + 8, 200)
-                        Animation.Tween(optionsFrame, {Size = UDim2.new(1, 0, 0, maxHeight)}, 0.25, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
-                        Animation.Tween(chevron, {Rotation = 180}, 0.2)
-                        Animation.Tween(mainStroke, {Color = theme.Primary}, 0.15)
+                        closeDropdown()
                     else
-                        Animation.Tween(optionsFrame, {Size = UDim2.new(1, 0, 0, 0)}, 0.2, Enum.EasingStyle.Quart)
-                        Animation.Tween(chevron, {Rotation = 0}, 0.2)
-                        Animation.Tween(mainStroke, {Color = theme.Border}, 0.15)
-                        task.delay(0.2, function()
-                            if not isOpen then optionsFrame.Visible = false end
-                        end)
+                        openDropdown()
                     end
                 end)
                 
@@ -2243,12 +2308,10 @@ function ClaudeUI:CreateWindow(config)
                 end
                 function DropdownAPI:SetOptions(newOptions)
                     dropdownConfig.Options = newOptions
-                    for _, child in ipairs(optionsList:GetChildren()) do
-                        if child:IsA("TextButton") then child:Destroy() end
-                    end
-                    for i, option in ipairs(newOptions) do
-                        createOption(option, i)
-                    end
+                    -- Will be refreshed next time dropdown opens
+                end
+                function DropdownAPI:Close()
+                    closeDropdown()
                 end
                 
                 table.insert(self.Elements, dropdownFrame)
