@@ -2545,23 +2545,33 @@ function ClaudeUI:CreateWindow(config)
                     gradientCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
                     gradientCorner.Parent = gradientFrame
                     
-                    local whiteGradient = Instance.new("UIGradient")
-                    whiteGradient.Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Color3.new(1, 1, 1)),
-                        ColorSequenceKeypoint.new(1, Color3.new(1, 1, 1))
-                    })
-                    whiteGradient.Transparency = NumberSequence.new({
-                        NumberSequenceKeypoint.new(0, 1),
-                        NumberSequenceKeypoint.new(1, 0)
-                    })
-                    whiteGradient.Parent = gradientFrame
+                    -- White overlay (left = white/opaque, right = transparent showing hue)
+                    local whiteOverlay = Instance.new("Frame")
+                    whiteOverlay.Name = "WhiteOverlay"
+                    whiteOverlay.BackgroundColor3 = Color3.new(1, 1, 1)
+                    whiteOverlay.BorderSizePixel = 0
+                    whiteOverlay.Size = UDim2.new(1, 0, 1, 0)
+                    whiteOverlay.ZIndex = 5502
+                    whiteOverlay.Parent = gradientFrame
                     
+                    local whiteCorner = Instance.new("UICorner")
+                    whiteCorner.CornerRadius = UDim.new(0, theme.RadiusMD)
+                    whiteCorner.Parent = whiteOverlay
+                    
+                    local whiteGradient = Instance.new("UIGradient")
+                    whiteGradient.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 1)
+                    })
+                    whiteGradient.Parent = whiteOverlay
+                    
+                    -- Black overlay (top = transparent, bottom = black/opaque)
                     local blackOverlay = Instance.new("Frame")
                     blackOverlay.Name = "BlackOverlay"
                     blackOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
                     blackOverlay.BorderSizePixel = 0
                     blackOverlay.Size = UDim2.new(1, 0, 1, 0)
-                    blackOverlay.ZIndex = 5502
+                    blackOverlay.ZIndex = 5503
                     blackOverlay.Parent = gradientFrame
                     
                     local blackCorner = Instance.new("UICorner")
@@ -2569,15 +2579,12 @@ function ClaudeUI:CreateWindow(config)
                     blackCorner.Parent = blackOverlay
                     
                     local blackGradient = Instance.new("UIGradient")
-                    blackGradient.Color = ColorSequence.new({
-                        ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)),
-                        ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0))
-                    })
                     blackGradient.Transparency = NumberSequence.new({
                         NumberSequenceKeypoint.new(0, 1),
                         NumberSequenceKeypoint.new(1, 0)
                     })
                     blackGradient.Rotation = 90
+                    blackGradient.Parent = blackOverlay
                     blackGradient.Parent = blackOverlay
                     
                     local colorSelector = Instance.new("Frame")
@@ -2585,7 +2592,7 @@ function ClaudeUI:CreateWindow(config)
                     colorSelector.BackgroundColor3 = currentColor
                     colorSelector.BorderSizePixel = 0
                     colorSelector.Size = UDim2.new(0, 18, 0, 18)
-                    colorSelector.Position = UDim2.new(1 - s, 0, 1 - v, 0)
+                    colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
                     colorSelector.AnchorPoint = Vector2.new(0.5, 0.5)
                     colorSelector.ZIndex = 5504
                     colorSelector.Parent = gradientFrame
@@ -2675,7 +2682,7 @@ function ClaudeUI:CreateWindow(config)
                     end
                     
                     local function updateSelectors()
-                        colorSelector.Position = UDim2.new(1 - s, 0, 1 - v, 0)
+                        colorSelector.Position = UDim2.new(s, 0, 1 - v, 0)
                         hueSelector.Position = UDim2.new(h, 0, 0.5, 0)
                     end
                     
@@ -2697,7 +2704,7 @@ function ClaudeUI:CreateWindow(config)
                             draggingGradient = true
                             local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
                             local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
-                            s = 1 - relX
+                            s = relX
                             v = 1 - relY
                             updateColor()
                             updateSelectors()
@@ -2739,7 +2746,7 @@ function ClaudeUI:CreateWindow(config)
                             if draggingGradient then
                                 local relX = Utility.Clamp((input.Position.X - gradientFrame.AbsolutePosition.X) / gradientFrame.AbsoluteSize.X, 0, 1)
                                 local relY = Utility.Clamp((input.Position.Y - gradientFrame.AbsolutePosition.Y) / gradientFrame.AbsoluteSize.Y, 0, 1)
-                                s = 1 - relX
+                                s = relX
                                 v = 1 - relY
                                 updateColor()
                                 updateSelectors()
