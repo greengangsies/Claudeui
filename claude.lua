@@ -1118,6 +1118,11 @@ function ClaudeUI:CreateWindow(config)
 -- END OF PART 2
 -- ═══════════════════════════════════════════════════════════════════════════════
 
+-- ═══════════════════════════════════════════════════════════════════════════════
+-- CLAUDE UI - PART 3: Tab System, Sections, Button & Toggle Elements
+-- ═══════════════════════════════════════════════════════════════════════════════
+
+    -- Create Tab Method (continues from Window in Part 2)
     function Window:CreateTab(tabConfig)
         tabConfig = Utility.Merge({
             Title = "Tab",
