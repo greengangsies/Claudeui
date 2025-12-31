@@ -1262,14 +1262,6 @@ function ClaudeUI:CreateWindow(config)
             end
             
             tabContent.Visible = true
-            tabContent.BackgroundTransparency = 1
-            -- Fade in all children since ScrollingFrame doesn't support GroupTransparency
-            for _, child in ipairs(tabContent:GetDescendants()) do
-                if child:IsA("Frame") and child.Name ~= "Divider" then
-                    child.BackgroundTransparency = 1
-                    Animation.Tween(child, {BackgroundTransparency = 0}, 0.25)
-                end
-            end
         end
         
         function Tab:Deactivate()
@@ -1283,12 +1275,7 @@ function ClaudeUI:CreateWindow(config)
                 Animation.Tween(self.Icon, {ImageColor3 = theme.TextSecondary}, 0.2)
             end
             
-            -- Simply hide without GroupTransparency animation since ScrollingFrame doesn't support it
-            task.delay(0.15, function()
-                if not self.IsActive then
-                    tabContent.Visible = false
-                end
-            end)
+            tabContent.Visible = false
         end
         
         -- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
