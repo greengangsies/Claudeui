@@ -1,4 +1,4 @@
--- UI Library v1.0 - FIXED
+-- UI Library v1.0 - FIXED with your notification UI
 -- Full-featured UI library for exploit development
 
 local Library = {}
@@ -29,7 +29,7 @@ function Library:New()
     return library
 end
 
--- Notification System
+-- Notification System (Using your exact UI)
 function Library:Notify(options)
     local title = options.Title or "Notification"
     local description = options.Description or ""
@@ -47,32 +47,36 @@ function Library:Notify(options)
         ScreenGui.ResetOnSpawn = false
     end
     
+    -- Using your exact notification structure
     local Notification = Instance.new("Frame")
     local TweenFrame = Instance.new("Frame")
     local UIGradient = Instance.new("UIGradient")
     local Icon = Instance.new("TextLabel")
-    local TitleLabel = Instance.new("TextLabel")
-    local DescriptionLabel = Instance.new("TextLabel")
+    local Title = Instance.new("TextLabel")
+    local Description = Instance.new("TextLabel")
     local UICorner = Instance.new("UICorner")
     
-    Notification.Name = type .. "Notification"
+    -- Properties based on your code
+    Notification.Name = type == "Success" and "Successful Notification" or "UnSuccessful Notification"
     Notification.Parent = ScreenGui
     Notification.BackgroundColor3 = Color3.fromRGB(42, 42, 42)
     Notification.BackgroundTransparency = 0.150
+    Notification.BorderColor3 = Color3.fromRGB(0, 0, 0)
     Notification.BorderSizePixel = 0
-    Notification.Position = UDim2.new(1.1, 0, 0.05, 0)
+    Notification.Position = UDim2.new(1.1, 0, 0.265423238, 0)
     Notification.Size = UDim2.new(0, 271, 0, 73)
     
     UICorner.CornerRadius = UDim.new(0, 6)
     UICorner.Parent = Notification
     
-    TweenFrame.Name = "TweenFrame"
+    TweenFrame.Name = "Tween Frame[Frame That represents the time left before the ui fades out]"
     TweenFrame.Parent = Notification
     TweenFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     TweenFrame.BackgroundTransparency = 0.150
+    TweenFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
     TweenFrame.BorderSizePixel = 0
     TweenFrame.Position = UDim2.new(0, 0, 1, 0)
-    TweenFrame.Size = UDim2.new(1, 0, 0, 3)
+    TweenFrame.Size = UDim2.new(0, 271, 0, 3)
     
     if type == "Success" then
         UIGradient.Color = ColorSequence.new{
@@ -88,53 +92,53 @@ function Library:Notify(options)
             ColorSequenceKeypoint.new(0.46, Color3.fromRGB(255, 88, 91)),
             ColorSequenceKeypoint.new(1.00, Color3.fromRGB(132, 0, 2))
         }
-        Icon.Text = "✕"
+        Icon.Text = "X"
         Icon.TextColor3 = Color3.fromRGB(255, 25, 48)
     end
     UIGradient.Parent = TweenFrame
     
     Icon.Name = "Icon"
     Icon.Parent = Notification
-    Icon.BackgroundTransparency = 1
+    Icon.BackgroundTransparency = 1.000
     Icon.Position = UDim2.new(0, 12, 0, 12)
     Icon.Size = UDim2.new(0, 24, 0, 24)
     Icon.Font = Enum.Font.GothamBold
-    Icon.TextSize = 22
+    Icon.TextSize = 22.000
     
-    TitleLabel.Name = "Title"
-    TitleLabel.Parent = Notification
-    TitleLabel.BackgroundTransparency = 1
-    TitleLabel.Position = UDim2.new(0, 44, 0, 10)
-    TitleLabel.Size = UDim2.new(0, 215, 0, 20)
-    TitleLabel.Font = Enum.Font.GothamBold
-    TitleLabel.Text = title
-    TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-    TitleLabel.TextSize = 16
-    TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    Title.Name = "Title"
+    Title.Parent = Notification
+    Title.BackgroundTransparency = 1.000
+    Title.Position = UDim2.new(0, 44, 0, 10)
+    Title.Size = UDim2.new(0, 215, 0, 20)
+    Title.Font = Enum.Font.GothamBold
+    Title.Text = title
+    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextSize = 16.000
+    Title.TextXAlignment = Enum.TextXAlignment.Left
     
-    DescriptionLabel.Name = "Description"
-    DescriptionLabel.Parent = Notification
-    DescriptionLabel.BackgroundTransparency = 1
-    DescriptionLabel.Position = UDim2.new(0, 44, 0, 32)
-    DescriptionLabel.Size = UDim2.new(0, 215, 0, 32)
-    DescriptionLabel.Font = Enum.Font.Gotham
-    DescriptionLabel.Text = description
-    DescriptionLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-    DescriptionLabel.TextSize = 13
-    DescriptionLabel.TextWrapped = true
-    DescriptionLabel.TextXAlignment = Enum.TextXAlignment.Left
-    DescriptionLabel.TextYAlignment = Enum.TextYAlignment.Top
+    Description.Name = "Description"
+    Description.Parent = Notification
+    Description.BackgroundTransparency = 1.000
+    Description.Position = UDim2.new(0, 44, 0, 32)
+    Description.Size = UDim2.new(0, 215, 0, 32)
+    Description.Font = Enum.Font.Gotham
+    Description.Text = description
+    Description.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Description.TextSize = 13.000
+    Description.TextWrapped = true
+    Description.TextXAlignment = Enum.TextXAlignment.Left
+    Description.TextYAlignment = Enum.TextYAlignment.Top
     
     -- Slide in animation
     Notification:TweenPosition(
-        UDim2.new(0.74, 0, 0.05, 0),
+        UDim2.new(0.740917802, 0, 0.265423238, 0),
         Enum.EasingDirection.Out,
         Enum.EasingStyle.Quad,
         0.5,
         true
     )
     
-    -- Timer bar animation
+    -- Timer bar animation (shrinks from right to left)
     TweenFrame:TweenSize(
         UDim2.new(0, 0, 0, 3),
         Enum.EasingDirection.InOut,
@@ -146,7 +150,7 @@ function Library:Notify(options)
     -- Fade out and destroy
     task.wait(duration)
     Notification:TweenPosition(
-        UDim2.new(1.1, 0, 0.05, 0),
+        UDim2.new(1.1, 0, 0.265423238, 0),
         Enum.EasingDirection.In,
         Enum.EasingStyle.Quad,
         0.5,
