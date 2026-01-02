@@ -1,4 +1,4 @@
--- UI Library v1.0
+-- UI Library v1.0 - FIXED
 -- Full-featured UI library for exploit development
 
 local Library = {}
@@ -6,6 +6,21 @@ Library.__index = Library
 
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+
+-- Compatibility function for ScreenGui parent
+local function getScreenGuiParent()
+    if gethui then
+        return gethui()
+    elseif syn and syn.protect_gui then
+        local gui = Instance.new("ScreenGui")
+        syn.protect_gui(gui)
+        gui.Parent = game:GetService("CoreGui")
+        return game:GetService("CoreGui")
+    else
+        return Players.LocalPlayer:WaitForChild("PlayerGui")
+    end
+end
 
 -- Create main library object
 function Library:New()
@@ -21,10 +36,16 @@ function Library:Notify(options)
     local type = options.Type or "Success" -- "Success" or "Error"
     local duration = options.Duration or 3
     
-    local ScreenGui = game:GetService("CoreGui"):FindFirstChild("LibraryNotifications") or Instance.new("ScreenGui")
-    ScreenGui.Name = "LibraryNotifications"
-    ScreenGui.Parent = game:GetService("CoreGui")
-    ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    local screenGuiParent = getScreenGuiParent()
+    local ScreenGui = screenGuiParent:FindFirstChild("LibraryNotifications")
+    
+    if not ScreenGui then
+        ScreenGui = Instance.new("ScreenGui")
+        ScreenGui.Name = "LibraryNotifications"
+        ScreenGui.Parent = screenGuiParent
+        ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ScreenGui.ResetOnSpawn = false
+    end
     
     local Notification = Instance.new("Frame")
     local TweenFrame = Instance.new("Frame")
@@ -146,8 +167,9 @@ function Library:CreateWindow(windowTitle)
     -- Create ScreenGui
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = "LibraryGui"
-    ScreenGui.Parent = game:GetService("CoreGui")
+    ScreenGui.Parent = getScreenGuiParent()
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    ScreenGui.ResetOnSpawn = false
     
     -- Main Window Frame
     local MainWindow = Instance.new("Frame")
@@ -307,6 +329,7 @@ function Library:CreateWindow(windowTitle)
     window.MainWindow = MainWindow
     window.ContentFrame = ContentFrame
     window.TabContainer = TabContainer
+    window.ScreenGui = ScreenGui
     
     -- Create Tab function
     function window:CreateTab(tabName)
@@ -359,8 +382,8 @@ function Library:CreateWindow(windowTitle)
         tab.TabButton = TabButton
         tab.TabContent = TabContent
         
-        -- Tab selection
-        TabButton.MouseButton1Click:Connect(function()
+        -- Tab selection function
+        local function selectTab()
             for _, t in pairs(window.Tabs) do
                 t.TabContent.Visible = false
                 t.TabButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -371,7 +394,11 @@ function Library:CreateWindow(windowTitle)
             TabButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
             TabButton.TextColor3 = Color3.fromRGB(141, 255, 27)
             window.CurrentTab = tab
-        end)
+        end
+        
+        tab.Select = selectTab
+        
+        TabButton.MouseButton1Click:Connect(selectTab)
         
         -- Create Section function
         function tab:CreateSection(sectionName)
@@ -1097,7 +1124,7 @@ function Library:CreateWindow(windowTitle)
         
         -- Auto-select first tab
         if #window.Tabs == 1 then
-            TabButton.MouseButton1Click:Fire()
+            tab.Select()
         end
         
         return tab
